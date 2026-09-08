@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <title>NEO CALCULATOR // 2050</title>
+    <style>
+        /* =========================
+           BASIC RESET
+        ========================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        /* =========================
+           BODY
+        ========================= */
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            background:
+                radial-gradient(
+                    circle at top left,
+                    #32176b,
+                    transparent 35%
+                ),
+                radial-gradient(
+                    circle at bottom right,
+                    #063c52,
+                    transparent 35%
+                ),
+                #05050d;
+            color: white;
+            overflow: hidden;
+        }
+        /* =========================
+           STARS
+        ========================= */
+        .stars {
+            position: fixed;
+            inset: 0;
+            background-image:
+                radial-gradient(
+                    1px 1px at 10% 20%,
+                    white,
+                    transparent
+                ),
+                radial-gradient(
+                    1px 1px at 30% 70%,
+                    white,
+                    transparent
+                ),
+                radial-gradient(
+                    1px 1px at 70% 30%,
+                    white,
+                    transparent
+                ),
+                radial-gradient(
+                    1px 1px at 90% 80%,
+                    white,
+                    transparent
+                );
+            background-size: 180px 180px;
+            opacity: .5;
+            pointer-events: none;
+        }
+        /* =========================
+           CYBER GRID
+        ========================= */
+        .grid {
+            position: fixed;
+            width: 140%;
+            height: 60%;
+            left: -20%;
+            bottom: -30%;
+            background-image:
+                linear-gradient(
+                    rgba(124,58,237,.18) 1px,
+                    transparent 1px
+                ),
+                linear-gradient(
+                    90deg,
+                    rgba(124,58,237,.18) 1px,
+                    transparent 1px
+                );
+            background-size: 45px 45px;
+            transform:
+                perspective(500px)
+                rotateX(60deg);
+            pointer-events: none;
+        }
+        /* =========================
+           CALCULATOR
+        ========================= */
+        .calculator {
+            position: relative;
+            z-index: 5;
+            width: 390px;
+            padding: 24px;
+            border-radius: 28px;
+            background: rgba(10,10,25,.95);
+            border:
+                1px solid rgba(167,139,250,.35);
+            box-shadow:
+                0 0 40px rgba(124,58,237,.35),
+                0 0 100px rgba(0,200,255,.08);
+            backdrop-filter: blur(20px);
+        }
+        /* =========================
+           HEADER
+        ========================= */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+        .logo h1 {
+            font-size: 18px;
+            letter-spacing: 4px;
+        }
+        .logo p {
+            margin-top: 5px;
+            font-size: 8px;
+            letter-spacing: 2px;
+            color: #68687e;
+        }
+        .online {
+            color: #69f5ae;
+            font-size: 8px;
+            letter-spacing: 1px;
+        }
+        .online span {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            margin-right: 5px;
+            border-radius: 50%;
+            background: #69f5ae;
+            box-shadow:
+                0 0 10px #69f5ae;
+        }
+        /* =========================
+           SYSTEM
+        ========================= */
+        .system {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: #5d5d75;
+            font-size: 8px;
+            letter-spacing: 1px;
+        }
+        /* =========================
+           DISPLAY
+        ========================= */
+        .display {
+            height: 135px;
+            padding: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: flex-end;
+            border-radius: 18px;
+            background: #070712;
+            border:
+                1px solid rgba(0,200,255,.18);
+            box-shadow:
+                inset 0 0 25px rgba(0,200,255,.05);
+            overflow: hidden;
+        }
+        #previous {
+            width: 100%;
+            min-height: 25px;
+            text-align: right;
+            color: #626278;
+            font-size: 16px;
+        }
+        #current {
+            width: 100%;
+            text-align: right;
+            color: white;
+            font-size: 42px;
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-shadow:
+                0 0 15px rgba(255,255,255,.3);
+        }
+        /* =========================
+           BUTTON GRID
+        ========================= */
+        .buttons {
+            display: grid;
+            grid-template-columns:
+                repeat(4, 1fr);
+            gap: 10px;
+        }
+        /* =========================
+           BUTTONS
+        ========================= */
+        button {
+            height: 62px;
+            border: none;
+            border-radius: 15px;
+            background:
+                linear-gradient(
+                    145deg,
+                    #1b1b2b,
+                    #10101c
+                );
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: .15s;
+            -webkit-tap-highlight-color:
+                transparent;
+        }
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow:
+                0 0 20px
+                rgba(124,58,237,.3);
+        }
+        button:active {
+            transform: scale(.92);
+        }
+        /* Function buttons */
+        .function {
+            color: #ff79aa;
+            background: #241624;
+        }
+        /* Operator buttons */
+        .operator {
+            color: #ad91ff;
+            background: #201936;
+        }
+        /* Equal button */
+        .equals {
+            color: white;
+            background:
+                linear-gradient(
+                    135deg,
+                    #7c3aed,
+                    #2563eb
+                );
+            box-shadow:
+                0 0 20px
+                rgba(124,58,237,.3);
+        }
+        /* Zero button */
+        .zero {
+            grid-column: span 2;
+        }
+        /* =========================
+           FOOTER
+        ========================= */
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 12px;
+            border-top:
+                1px solid
+                rgba(255,255,255,.05);
+            color: #55556c;
+            font-size: 7px;
+            letter-spacing: 1px;
+        }
+        /* =========================
+           MOBILE
+        ========================= */
+        @media (max-width: 450px) {
+            body {
+                padding: 10px;
+            }
+            .calculator {
+                width: 100%;
+                padding: 18px;
+            }
+            button {
+                height: 58px;
+                font-size: 18px;
+            }
+            #current {
+                font-size: 34px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background -->
+    <div class="stars"></div>
+    <div class="grid"></div>
+    <!-- Calculator -->
+    <div class="calculator">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <h1>NEO CALC</h1>
+                <p>
+                    QUANTUM COMPUTATION UNIT
+                </p>
+            </div>
+            <div class="online">
+                <span></span>
+                ONLINE
+            </div>
+        </div>
+        <!-- System -->
+        <div class="system">
+            <span>
+                SYSTEM // 2050
+            </span>
+            <span>
+                AI CORE ACTIVE
+            </span>
+        </div>
+        <!-- Display -->
+        <div class="display">
+            <div id="previous"></div>
+            <div id="current">
+                0
+            </div>
+        </div>
+        <!-- Calculator Buttons -->
+        <div class="buttons">
+            <!-- Row 1 -->
+            <button
+                class="function"
+                onclick="clearCalculator()">
+                AC
+            </button>
+            <button
+                class="function"
+                onclick="deleteNumber()">
+                DEL
+            </button>
+            <button
+                class="operator"
+                onclick="chooseOperator('%')">
+                %
+            </button>
+            <button
+                class="operator"
+                onclick="chooseOperator('/')">
+                ÷
+            </button>
+            <!-- Row 2 -->
+            <button
+                onclick="addNumber('7')">
+                7
+            </button>
+            <button
+                onclick="addNumber('8')">
+                8
+            </button>
+            <button
+                onclick="addNumber('9')">
+                9
+            </button>
+            <button
+                class="operator"
+                onclick="chooseOperator('*')">
+                ×
+            </button>
+            <!-- Row 3 -->
+            <button
+                onclick="addNumber('4')">
+                4
+            </button>
+            <button
+                onclick="addNumber('5')">
+                5
+            </button>
+            <button
+                onclick="addNumber('6')">
+                6
+            </button>
+            <button
+                class="operator"
+                onclick="chooseOperator('-')">
+                −
+            </button>
+            <!-- Row 4 -->
+            <button
+                onclick="addNumber('1')">
+                1
+            </button>
+            <button
+                onclick="addNumber('2')">
+                2
+            </button>
+            <button
+                onclick="addNumber('3')">
+                3
+            </button>
+            <button
+                class="operator"
+                onclick="chooseOperator('+')">
+                +
+            </button>
+            <!-- Row 5 -->
+            <button
+                class="zero"
+                onclick="addNumber('0')">
+                0
+            </button>
+            <button
+                onclick="addNumber('.')">
+                .
+            </button>
+            <button
+                class="equals"
+                onclick="calculate()">
+                =
+            </button>
+        </div>
+        <!-- Footer -->
+        <div class="footer">
+            <span>
+                ● NEURAL ENGINE
+            </span>
+            <span>
+                KEYBOARD READY
+            </span>
+        </div>
+    </div>
+    <!-- =================================================
+         JAVASCRIPT
+    ================================================= -->
+    <script>
+        /* =========================
+           VARIABLES
+        ========================= */
+        let current = "";
+        let previous = "";
+        let operator = null;
+        /* =========================
+           DISPLAY
+        ========================= */
+        function updateDisplay() {
+            document.getElementById(
+                "current"
+            ).textContent =
+                current || "0";
+            if (
+                previous !== "" &&
+                operator !== null
+            ) {
+                let symbol = operator;
+                if (operator === "*") {
+                    symbol = "×";
+                }
+                if (operator === "/") {
+                    symbol = "÷";
+                }
+                document.getElementById(
+                    "previous"
+                ).textContent =
+                    previous + " " + symbol;
+            }
+            else {
+                document.getElementById(
+                    "previous"
+                ).textContent = "";
+            }
+        }
+        /* =========================
+           ADD NUMBER
+        ========================= */
+        function addNumber(number) {
+            /* Prevent multiple decimals */
+            if (
+                number === "." &&
+                current.includes(".")
+            ) {
+                return;
+            }
+            /* Prevent multiple leading zeros */
+            if (
+                current === "0" &&
+                number !== "."
+            ) {
+                current = number;
+            }
+            else {
+                current += number;
+            }
+            updateDisplay();
+        }
+        /* =========================
+           OPERATOR
+        ========================= */
+        function chooseOperator(
+            selectedOperator
+        ) {
+            /* Nothing entered */
+            if (
+                current === "" &&
+                previous === ""
+            ) {
+                return;
+            }
+            /* If there is already
+               a complete calculation */
+            if (
+                previous !== "" &&
+                current !== "" &&
+                operator !== null
+            ) {
+                calculate();
+            }
+            if (previous === "") {
+                previous = current;
+            }
+            current = "";
+            operator =
+                selectedOperator;
+            updateDisplay();
+        }
+        /* =========================
+           CALCULATE
+        ========================= */
+        function calculate() {
+            if (
+                previous === "" ||
+                current === "" ||
+                operator === null
+            ) {
+                return;
+            }
+            const first =
+                Number(previous);
+            const second =
+                Number(current);
+            let result;
+            /* Addition */
+            if (operator === "+") {
+                result =
+                    first + second;
+            }
+            /* Subtraction */
+            else if (operator === "-") {
+                result =
+                    first - second;
+            }
+            /* Multiplication */
+            else if (operator === "*") {
+                result =
+                    first * second;
+            }
+            /* Division */
+            else if (operator === "/") {
+                if (second === 0) {
+                    document.getElementById(
+                        "current"
+                    ).textContent =
+                        "ERROR";
+                    document.getElementById(
+                        "previous"
+                    ).textContent =
+                        "CANNOT DIVIDE BY ZERO";
+                    current = "";
+                    previous = "";
+                    operator = null;
+                    return;
+                }
+                result =
+                    first / second;
+            }
+            /* Percentage / Modulo */
+            else if (operator === "%") {
+                result =
+                    first % second;
+            }
+            /* Remove floating errors */
+            result =
+                Math.round(
+                    (result +
+                    Number.EPSILON)
+                    * 100000000
+                ) / 100000000;
+            current =
+                String(result);
+            previous = "";
+            operator = null;
+            updateDisplay();
+        }
+        /* =========================
+           CLEAR
+        ========================= */
+        function clearCalculator() {
+            current = "";
+            previous = "";
+            operator = null;
+            updateDisplay();
+        }
+        /* =========================
+           DELETE
+        ========================= */
+        function deleteNumber() {
+            current =
+                current.slice(0, -1);
+            updateDisplay();
+        }
+        /* =========================
+           KEYBOARD SUPPORT
+        ========================= */
+        document.addEventListener(
+            "keydown",
+            function(event) {
+                const key =
+                    event.key;
+                /* Numbers */
+                if (
+                    key >= "0" &&
+                    key <= "9"
+                ) {
+                    addNumber(key);
+                    return;
+                }
+                /* Decimal */
+                if (key === ".") {
+                    addNumber(".");
+                    return;
+                }
+                /* Operators */
+                if (
+                    key === "+" ||
+                    key === "-" ||
+                    key === "*" ||
+                    key === "/" ||
+                    key === "%"
+                ) {
+                    chooseOperator(key);
+                    return;
+                }
+                /* Enter */
+                if (
+                    key === "Enter" ||
+                    key === "="
+                ) {
+                    event.preventDefault();
+                    calculate();
+                    return;
+                }
+                /* Backspace */
+                if (
+                    key === "Backspace"
+                ) {
+                    deleteNumber();
+                    return;
+                }
+                /* Escape */
+                if (
+                    key === "Escape"
+                ) {
+                    clearCalculator();
+                    return;
+                }
+            }
+        );
+        /* =========================
+           START
+        ========================= */
+        updateDisplay();
+    </script>
+</body>
+</html>
